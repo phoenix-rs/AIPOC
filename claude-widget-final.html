@@ -1,0 +1,77 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Segoe UI,sans-serif;background:#0f1117;color:#e8eaf0;height:100vh;display:flex;flex-direction:column;overflow:hidden}#setup{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;gap:11px}h2{font-size:15px;color:#a78bfa;text-align:center}small{font-size:11px;color:#7b82a0;text-align:center;max-width:270px;line-height:1.5}input,textarea{width:100%;max-width:310px;background:#161927;border:1px solid #2e3250;border-radius:8px;color:#e8eaf0;font-family:inherit;font-size:12px;padding:9px 11px;outline:none}textarea{resize:vertical;min-height:65px}.go{width:100%;max-width:310px;background:linear-gradient(135deg,#6c63ff,#a78bfa);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:600;padding:10px;cursor:pointer}#chat{flex:1;display:none;flex-direction:column;overflow:hidden}.hdr{padding:9px 13px;background:#1a1d27;border-bottom:1px solid #2e3250;display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:#a78bfa}.dot{width:6px;height:6px;border-radius:50%;background:#4ecca3;margin-left:auto;animation:p 2s infinite}@keyframes p{0%,100%{opacity:1}50%{opacity:.3}}#msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:9px}#msgs::-webkit-scrollbar{width:3px}#msgs::-webkit-scrollbar-thumb{background:#2e3250}.m{display:flex;gap:7px;max-width:92%}.u{align-self:flex-end;flex-direction:row-reverse}.av{width:22px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}.u .av{background:#2d3158}.ai .av{background:linear-gradient(135deg,#6c63ff,#a78bfa)}.bub{padding:8px 11px;border-radius:10px;font-size:12px;line-height:1.5;white-space:pre-wrap;word-break:break-word}.u .bub{background:#2d3158;border-bottom-right-radius:2px}.ai .bub{background:#1e2235;border:1px solid #2e3250;border-bottom-left-radius:2px}.dots{display:flex;gap:3px;padding:2px 0}.dots span{width:5px;height:5px;border-radius:50%;background:#a78bfa;animation:b 1.2s infinite}.dots span:nth-child(2){animation-delay:.2s}.dots span:nth-child(3){animation-delay:.4s}@keyframes b{0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-5px);opacity:1}}#bar{padding:8px 12px;background:#1a1d27;border-top:1px solid #2e3250;display:flex;gap:7px;align-items:flex-end}#inp{flex:1;background:#161927;border:1px solid #2e3250;border-radius:8px;color:#e8eaf0;font-family:inherit;font-size:12px;padding:8px 10px;outline:none;resize:none;max-height:70px}#inp:focus{border-color:#6c63ff}#inp::placeholder{color:#7b82a0}#sb{width:30px;height:30px;background:linear-gradient(135deg,#6c63ff,#a78bfa);border:none;border-radius:7px;cursor:pointer;color:#fff;font-size:14px;flex-shrink:0}#sb:disabled{opacity:.4}.err{background:rgba(255,100,100,.1);border:1px solid rgba(255,100,100,.3);border-radius:7px;color:#ff6b6b;font-size:11px;padding:7px 10px;align-self:center;text-align:center;max-width:90%;line-height:1.5}</style></head><body>
+<div id="setup">
+<div style="font-size:34px">✦</div>
+<h2>Claude AI Data Assistant</h2>
+<small>Paste your Anthropic API key, then optionally describe your data for better answers</small>
+<input type="password" id="k" placeholder="sk-ant-api03-..."/>
+<textarea id="ctx" placeholder="Optional: describe your data e.g. Sales funnel with columns: Account Manager, Opp Value, Status, Probability %..."></textarea>
+<button class="go" onclick="go()">Start Chat →</button>
+<small>Free key at <a href="https://console.anthropic.com" target="_blank" style="color:#a78bfa">console.anthropic.com</a></small>
+</div>
+<div id="chat">
+<div class="hdr">✦ Claude AI — KSA Sales Analyst <div class="dot"></div></div>
+<div id="msgs"></div>
+<div id="bar">
+<textarea id="inp" rows="1" placeholder="Ask about your data…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send()}" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,70)+'px'"></textarea>
+<button id="sb" onclick="send()">➤</button>
+</div>
+</div>
+<script>
+var K='',C='',H=[],busy=false;
+function go(){
+  K=document.getElementById('k').value.trim();
+  C=document.getElementById('ctx').value.trim();
+  if(!K){alert('Please enter your Anthropic API key');return;}
+  document.getElementById('setup').style.display='none';
+  var ch=document.getElementById('chat');ch.style.display='flex';ch.style.flexDirection='column';
+  add('ai','Hello! I am your AI analyst for the KSA Sales Funnel.\n\nI know your report has: Account Manager, Opp Value, Probability %, Status, Vertical, Total Margin Value, Exp Closing Date, Market Unit, Offering, and more.\n\nWhat would you like to know?');
+}
+function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
+function add(r,t){
+  var d=document.getElementById('msgs'),el=document.createElement('div');
+  el.className='m '+r;
+  el.innerHTML='<div class="av">'+(r==='u'?'👤':'✦')+'</div><div class="bub">'+esc(t)+'</div>';
+  d.appendChild(el);d.scrollTop=d.scrollHeight;
+}
+function typing(){
+  var d=document.getElementById('msgs'),el=document.createElement('div');
+  el.className='m ai';el.id='typ';
+  el.innerHTML='<div class="av">✦</div><div class="bub"><div class="dots"><span></span><span></span><span></span></div></div>';
+  d.appendChild(el);d.scrollTop=d.scrollHeight;
+}
+function rmTyping(){var t=document.getElementById('typ');if(t)t.remove();}
+function errMsg(m){
+  var d=document.getElementById('msgs'),el=document.createElement('div');
+  el.className='err';el.innerHTML=m;d.appendChild(el);d.scrollTop=d.scrollHeight;
+}
+async function send(){
+  var inp=document.getElementById('inp'),t=inp.value.trim();
+  if(!t||busy)return;
+  inp.value='';inp.style.height='auto';
+  busy=true;document.getElementById('sb').disabled=true;
+  add('u',t);H.push({role:'user',content:t});typing();
+  var sys='You are a data analyst AI for a Power BI Sales Funnel KSA report. Columns: Account Manager, Actual Submission, Creation Date, Customer Name, Exp Closing Date, Joint Leads, Market Unit, Offering, Opp Value, Opp Weighted variants, Probability %, Roadmap Status, Status, Total Margin Value, Total Opp Value, Vertical. Be concise and analytical. Suggest DAX when helpful.'+(C?'\nExtra context: '+C:'');
+  try{
+    var r=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':K,'anthropic-version':'2023-06-01'},
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:800,system:sys,messages:H})
+    });
+    var data=await r.json();
+    rmTyping();
+    if(!r.ok)throw new Error(data.error?data.error.message:'HTTP error '+r.status);
+    var rep=data.content&&data.content[0]?data.content[0].text:'No response.';
+    add('ai',rep);H.push({role:'assistant',content:rep});
+  }catch(e){
+    rmTyping();
+    var msg=e.message;
+    if(msg.indexOf('fetch')>-1||msg.indexOf('NetworkError')>-1||msg.indexOf('Failed')>-1){
+      errMsg('⚠️ The HTML Content visual is blocking external API calls.<br><br>✅ <b>Solution:</b> Open the widget directly in your browser:<br><a href="https://phoenix-rs.github.io/AIPOC/claude-widget-compact.html" target="_blank" style="color:#a78bfa">Open Full Widget ↗</a>');
+    } else {
+      errMsg('Error: '+msg);
+    }
+  }
+  busy=false;document.getElementById('sb').disabled=false;
+  document.getElementById('inp').focus();
+}
+</script></body></html>
